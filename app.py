@@ -26,12 +26,12 @@ def register():
     if existing_user:
         return add_headers(EXISTING_USER, EXISTING_USER['code'])
     id = repo.create_one(user)
-    # call BC to create user with id
     trx = bc.register_bc(str(id))
     user['_id'] = str(id)
     user['hash'] = trx
     print(user)
     return add_headers(user, OK)
+
 
 
 @app.route("/login", methods=['POST'])
@@ -47,22 +47,32 @@ def login():
         return add_headers(UNKNOWN_USER, UNKNOWN_USER['code'])
     user['exp'] = datetime.datetime.utcnow() + datetime.timedelta(seconds=JWT_EXP_TIME)
     token = jwt.encode(user, SECRET, algorithm=ALG)
-    print(user)
-    return add_headers(SUCCESS, OK, token)
+    SUCCESS['token'] = token.decode("utf-8")
+    return add_headers(SUCCESS, OK)
 
 
 @app.route("/thanks", methods=['GET'])
 def get_thanks():
     logging.info('REQUEST: ' + str(request))
     token = request.headers['Authorization']
+    print(token)
     token_user = jwt.decode(token, SECRET, algorithms=ALG)
+
+    print(token_user)
+
     id = token_user['_id']
     db_user = repo.get_by_id(id)
     if not db_user:
         return add_headers(UNKNOWN_USER, UNKNOWN_USER['code'])
-    bc_user = bc.get_thank(db_user["_id"])
+    print(db_user['_id'])
+    bc_user = bc.get_thank(db_user['_id'])
     bc_user['name'] = db_user['username']
     return add_headers(bc_user, OK)
+
+
+@app.route("/users", methods=['GET'])
+def get_users():
+    return add_headers("OK", OK)
 
 
 @app.route("/thanks", methods=['POST'])
@@ -76,11 +86,20 @@ def add_thanks():
     token = request.headers['Authorization']
     from_user = jwt.decode(token, SECRET, algorithms=ALG)
     id = request.args.get('id')
-    to_user = repo.get_by_id(id)
+    if id:
+       to_user = repo.get_by_id(id)
+    else:
+        name = request.args.get('name')
+        if not name:
+            # no name or ID in header
+            return add_headers(UNKNOWN_USER, UNKNOWN_USER['code'])
+        else:
+            to_user = repo.get_by_name(name)
     if not to_user:
         return add_headers(UNKNOWN_USER, UNKNOWN_USER['code'])
     thank['name'] = from_user['username']
-    bc.add_thank(to_user['_id'], thank)
+    res = bc.add_thank(to_user['_id'], thank)
+    SUCCESS['hash'] = res
     return add_headers(SUCCESS, OK)
 
 

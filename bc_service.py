@@ -14,7 +14,8 @@ def register_bc(id, balance=None):
 def add_thank(id, thank):
     res = requests.post(POST_THX_URL + str(id),
                         json.dumps(thank, ensure_ascii=False),
-                        headers=JSON_HEADER).json()
+                        headers=JSON_HEADER,
+                        timeout=300).json()
     return res
 
 
@@ -27,8 +28,8 @@ def _example():
     thx = {"name": "JOHN",
            "type": "ta",
            "message": "thankssss"}
-    res = register_bc("001")
-    print(res)
+    #res = register_bc("001")
+    #print(res)
     res = add_thank("001", thx)
     print(res)
     res = get_thank("001")

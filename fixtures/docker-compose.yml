@@ -2,9 +2,8 @@ version: "2"
 services:
   api:
     container_name: hc_api
-    image: szlaci83/hc_api
+    build: ../.
     restart: always
-    build: .
     ports:
       - "4568:4567"
     links:

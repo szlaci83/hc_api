@@ -7,12 +7,12 @@ from pprint import pprint
 
 
 # for dockerised version
-client = MongoClient(MONGO_DOCKER)
+#client = MongoClient(MONGO_DOCKER)
 
 # for local deployment
-#client = MongoClient(MONGO_LOCAL)
+client = MongoClient(MONGO_LOCAL)
 
-db = client.text
+db = client.text3
 collection = db.users
 
 def create_one(document):
@@ -46,6 +46,7 @@ def get_by_id(id):
         logging.info('FETCHED: ' + str(entry))
     return entry
 
+
 def get_by_name_and_pw(user_name, pw):
     try:
         user = collection.find_one({"username": user_name, "password": pw})
@@ -55,6 +56,18 @@ def get_by_name_and_pw(user_name, pw):
         return None
     logging.info('FETCHED: ' + str(user))
     return user
+
+
+def get_by_name(user_name):
+    try:
+        user = collection.find_one({"username": user_name})
+        user['_id'] = str(user['_id'])
+    except:
+        logging.error("ERROR DURING FETCH FROM MONGODB!")
+        return None
+    logging.info('FETCHED: ' + str(user))
+    return user
+
 
 def delete_by_id(id):
     '''
