@@ -5,6 +5,9 @@ from pymongo import MongoClient
 import logging
 from pprint import pprint
 
+'''
+    Repository using MongoDB to store user data
+'''
 
 # for dockerised version
 #client = MongoClient(MONGO_DOCKER)

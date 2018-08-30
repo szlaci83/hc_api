@@ -4,6 +4,9 @@ from email.mime.text import MIMEText
 from properties import *
 from mail_repo import create_invite_mail, create_reg_mail
 
+'''
+  Service to send invitation and registration e-mails
+'''
 
 def _sendmail(to, subject, html, text):
     msg = MIMEMultipart('alternative')

@@ -1,6 +1,10 @@
 from itsdangerous import URLSafeTimedSerializer
 from properties import *
 
+'''
+    Service to generate and validate authorization tokens
+'''
+
 
 def generate_reg_token(email):
     serializer = URLSafeTimedSerializer(SECRET_KEY)

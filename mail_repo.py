@@ -1,5 +1,8 @@
 from properties import HC_URL
 
+'''
+    Repository using html and txt templates to create e-mails 
+'''
 
 def create_reg_mail(name, link):
     body, text = _get_from_template('reg')

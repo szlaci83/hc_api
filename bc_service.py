@@ -3,6 +3,9 @@ from properties import *
 import requests
 import json
 
+'''
+ Service to connect to the blockchain REST API
+'''
 
 def register_bc(id, balance=None):
     balance = balance or "0"
