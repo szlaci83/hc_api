@@ -1,0 +1,5 @@
+Hello {invited_user}!\n
+{from_user} invited you to HumanityCoins!\n
+You can register by clicking on this link:\n
+{HC_URL}\n
+HC team
