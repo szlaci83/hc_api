@@ -12,7 +12,7 @@ from pprint import pprint
 # for local deployment
 client = MongoClient(MONGO_LOCAL)
 
-db = client.text3
+db = client.text7
 collection = db.users
 
 def create_one(document):
@@ -23,8 +23,8 @@ def create_one(document):
     '''
     try:
         result = collection.insert_one(document).inserted_id
-    except:
-        logging.error("CANNOT SAVE TO MONGODB!")
+    except Exception as e:
+        logging.error(e)
         raise ValueError
     logging.info('CREATED: ' + str(result))
     return str(result)
@@ -39,21 +39,32 @@ def get_by_id(id):
     entry = None
     try:
         entry = collection.find_one({'_id': ObjectId(id)})
-    except:
-        logging.error("ERROR DURING FETCH FROM MONGODB!")
+    except Exception as e:
+        logging.error("ERROR DURING FETCH FROM MONGODB!" + e)
     if entry:
         entry['_id'] = str(entry['_id'])
         logging.info('FETCHED: ' + str(entry))
     return entry
 
 
+def update_one(id, document):
+    try:
+        collection.update_one({'_id': id}, {"$set": document})
+    except Exception as e:
+        logging.error("ERROR DURING WRITE TO MONGODB!" + e)
+        return False
+    return True
+
+
 def get_by_name_and_pw(user_name, pw):
     try:
         user = collection.find_one({"username": user_name, "password": pw})
-        user['_id'] = str(user['_id'])
-    except:
-        logging.error("ERROR DURING FETCH FROM MONGODB!")
+    except Exception as e:
+        logging.error("ERROR DURING FETCH FROM MONGODB!" + str(e))
         return None
+    if not user:
+        return None
+    user['_id'] = str(user['_id'])
     logging.info('FETCHED: ' + str(user))
     return user
 
@@ -62,9 +73,22 @@ def get_by_name(user_name):
     try:
         user = collection.find_one({"username": user_name})
         user['_id'] = str(user['_id'])
-    except:
-        logging.error("ERROR DURING FETCH FROM MONGODB!")
+    except Exception as e:
+        logging.error("ERROR DURING FETCH FROM MONGODB!" + e)
         return None
+    logging.info('FETCHED: ' + str(user))
+    return user
+
+
+def get_by_email(email):
+    try:
+        user = collection.find_one({"email": email})
+    except Exception as e:
+        logging.error("ERROR DURING FETCH FROM MONGODB!" + str(e))
+        return None
+    if not user:
+        return None
+    user['_id'] = str(user['_id'])
     logging.info('FETCHED: ' + str(user))
     return user
 
@@ -77,8 +101,8 @@ def delete_by_id(id):
     '''
     try:
         result = collection.delete_one({'_id': ObjectId(id)}).acknowledged
-    except:
-        logging.error("ERROR DURING DELETION FROM MONGODB!")
+    except Exception as e:
+        logging.error("ERROR DURING DELETION FROM MONGODB!" + e)
         return None
     logging.info('DELETED: ' + str(id))
     return result
@@ -94,8 +118,8 @@ def get_ids_str():
         documents = collection.find({})
         for document in documents:
             id_list.append(str(document['_id']))
-    except:
-        logging.error("ERROR DURING GETTING IDS FROM MONGODB!")
+    except Exception as e:
+        logging.error("ERROR DURING GETTING IDS FROM MONGODB!" + e)
         return None
     logging.info('FOUND: ' + str(id_list))
     return id_list
